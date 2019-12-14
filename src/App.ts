@@ -6,7 +6,7 @@ import morgan from "morgan";
 import cors from "cors";
 import bodyParser from "body-parser";
 
-import { IController } from "./controllers";
+import { IRoutes } from "./routes";
 
 import { container } from "./configs/inversify";
 import { Types } from "./configs/types";
@@ -33,8 +33,8 @@ export default class App {
         app.use(bodyParser.json());
         app.use(bodyParser.urlencoded({ extended: true }));
 
-        const controllers: IController[] = container.getAll<IController>(Types.Controller);
-        controllers.forEach(controller => controller.register(app));
+        const routes: IRoutes[] = container.getAll<IRoutes>(Types.Routes);
+        routes.forEach(route => route.register(app));
 
         app.use("*", (req: Request, res: Response) => {
             sendNotFoundResponse(res, "Invalid api called");

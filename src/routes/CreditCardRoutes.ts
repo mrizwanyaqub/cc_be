@@ -8,7 +8,7 @@ import { Types } from "../configs/types";
 @injectable()
 export class CreditCardRoutes implements IRoutes {
 
-    @inject(Types.CreditCardService)
+    @inject(Types.Controller)
     private creditCardController: CreditCardController;
 
     public register(app: Application): void {
