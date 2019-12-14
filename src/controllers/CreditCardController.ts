@@ -1,37 +1,31 @@
-import { Application, Request, Response } from "express";
 import { inject, injectable } from "inversify";
-import { IController } from "./IController";
-import { CreditCardService } from "../services";
-import { sendDataResponse, sendRecordCreatedResponse } from "../utils/response";
 import { Types } from "../configs/types";
+import { CreditCardService } from "../services";
 import { BadRequest } from "../utils/exceptions";
 import { validateCreditCardPost } from "../validations/validators";
+import {ICreditCard} from "../entities";
 
 @injectable()
-export class CreditCardController implements IController {
+export class CreditCardController {
 
     @inject(Types.CreditCardService)
     private creditCardService: CreditCardService;
 
-    public register(app: Application): void {
+    public getCreditCardById = (id: string) => {
+        return this.creditCardService.getCreditCard(id);
+    };
 
-        app.route("/creditcards/:id").get((req: Request, res: Response) => {
-            sendDataResponse(res, this.creditCardService.getCreditCard(req.params.id));
-        });
+    public getAllCreditCards = () => {
+        return this.creditCardService.getCreditCards();
+    };
 
-        app.route("/creditcards").get((req: Request, res: Response) => {
-            sendDataResponse(res, this.creditCardService.getCreditCards());
-        });
+    public addCreditCard = (creditCard: ICreditCard) => {
+        const errors = validateCreditCardPost(creditCard);
+        if (errors.length)
+            throw new BadRequest(JSON.stringify(errors));
 
-        app.route("/creditcards").post( (req: Request, res: Response) => {
-            const body = req.body;
-            const errors = validateCreditCardPost(body);
-            if (errors.length)
-                throw new BadRequest(JSON.stringify(errors));
-
-            sendRecordCreatedResponse(res, this.creditCardService.addCreditCard(req.body));
-        });
-    }
+        return this.creditCardService.addCreditCard(creditCard);
+    };
 }
 
 export default CreditCardController;
